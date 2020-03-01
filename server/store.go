@@ -124,7 +124,7 @@ func (p *Plugin) GetQuestionToAsk() (string, string) {
 				if err != nil {
 					return "", ""
 				}
-				return v.CreatorID, fmt.Sprintf("Type a new question for the quiz `%s` or `end` to finish adding questions.", v.ID)
+				return v.CreatorID, fmt.Sprintf("Type a new question for the quiz `%s` or type `end` to finish adding questions.", v.ID)
 			}
 
 			err := p.SetAskParticipants(quizzes, v.ID, original)
@@ -171,27 +171,27 @@ func (p *Plugin) SetAskForAnswer(quizzes map[string]*Quiz, quizID string, i int,
 	return p.SaveAllQuizzes(quizzes, originalJSON)
 }
 
-func (p *Plugin) AddAnswer(userID string, quizzID string, questionIndex int, answer string) error {
+func (p *Plugin) AddAnswer(userID string, quizID string, questionIndex int, answer string) error {
 	quizzes, originalJSON := p.GetAllQuizzes()
-	quizzes[quizzID].Questions[questionIndex].Answers[userID].Answer = answer
-	quizzes[quizzID].Questions[questionIndex].Answers[userID].Asking = false
+	quizzes[quizID].Questions[questionIndex].Answers[userID].Answer = answer
+	quizzes[quizID].Questions[questionIndex].Answers[userID].Asking = false
 	return p.SaveAllQuizzes(quizzes, originalJSON)
 }
 
-func (p *Plugin) CompleteQuiz(quizzID string) error {
+func (p *Plugin) CompleteQuiz(quizID string) error {
 	quizzes, originalJSON := p.GetAllQuizzes()
-	quizzes[quizzID].Complete = true
-	quizzes[quizzID].AskingForNewQuestion = false
+	quizzes[quizID].Complete = true
+	quizzes[quizID].AskingForNewQuestion = false
 	return p.SaveAllQuizzes(quizzes, originalJSON)
 }
 
-func (p *Plugin) AddQuestion(quizzID string, question string) error {
+func (p *Plugin) AddQuestion(quizID string, question string) error {
 	quizzes, originalJSON := p.GetAllQuizzes()
-	quizzes[quizzID].Questions = append(quizzes[quizzID].Questions, &Question{
+	quizzes[quizID].Questions = append(quizzes[quizID].Questions, &Question{
 		Question: question,
 		Answers:  make(map[string]*Answer),
 	})
-	quizzes[quizzID].AskingForNewQuestion = false
+	quizzes[quizID].AskingForNewQuestion = false
 	return p.SaveAllQuizzes(quizzes, originalJSON)
 }
 
@@ -204,7 +204,7 @@ func (p *Plugin) GetQuiz(quizID string) (*Quiz, error) {
 	return q, nil
 }
 
-func (p *Plugin) AddParticipants(userID, quizzID, in string) error {
+func (p *Plugin) AddParticipants(userID, quizID, in string) error {
 	participantsUserNames := strings.Split(strings.TrimSpace(in), " ")
 	participantsIDs := []string{}
 	for _, v := range participantsUserNames {
@@ -226,7 +226,7 @@ func (p *Plugin) AddParticipants(userID, quizzID, in string) error {
 	}
 
 	quizzes, originalJSON := p.GetAllQuizzes()
-	quizzes[quizzID].Participants = participantsIDs
-	quizzes[quizzID].AskingParticipants = false
+	quizzes[quizID].Participants = participantsIDs
+	quizzes[quizID].AskingParticipants = false
 	return p.SaveAllQuizzes(quizzes, originalJSON)
 }

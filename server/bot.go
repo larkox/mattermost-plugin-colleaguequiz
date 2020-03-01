@@ -68,7 +68,7 @@ func (p *Plugin) MessageHasBeenPosted(c *plugin.Context, post *model.Post) {
 		return
 	}
 
-	ok, answerType, quizzID, questionIndex := p.HasPendingAnswer(post.UserId)
+	ok, answerType, quizID, questionIndex := p.HasPendingAnswer(post.UserId)
 
 	if !ok {
 		p.PostBotDM(post.UserId, "Thank you for messaging me, but I am a bot. I will get back to you whenever I have questions for you.")
@@ -77,7 +77,7 @@ func (p *Plugin) MessageHasBeenPosted(c *plugin.Context, post *model.Post) {
 
 	switch answerType {
 	case AskForAnswer:
-		err := p.AddAnswer(post.UserId, quizzID, questionIndex, post.Message)
+		err := p.AddAnswer(post.UserId, quizID, questionIndex, post.Message)
 		if err != nil {
 			p.PostBotDM(post.UserId, "There has been an internal error. Please, answer again.")
 			return
@@ -86,16 +86,16 @@ func (p *Plugin) MessageHasBeenPosted(c *plugin.Context, post *model.Post) {
 		return
 	case AskForNewQuestion:
 		if post.Message == "end" {
-			err := p.CompleteQuiz(quizzID)
+			err := p.CompleteQuiz(quizID)
 			if err != nil {
-				p.PostBotDM(post.UserId, "There has been an internal error while completing the quizz. Please, write \"end\" again.")
+				p.PostBotDM(post.UserId, "There has been an internal error while completing the quiz. Please, type \"end\" again.")
 				return
 			}
-			p.PostBotDM(post.UserId, "Quizz completed. Now the participants will start to receive the questions to answer.")
+			p.PostBotDM(post.UserId, "Quiz completed. Now the participants will start to receive the questions to answer.")
 			return
 		}
 
-		err := p.AddQuestion(quizzID, post.Message)
+		err := p.AddQuestion(quizID, post.Message)
 		if err != nil {
 			p.PostBotDM(post.UserId, "There has been an internal error while adding the question. Please, write the question again.")
 			return
@@ -103,7 +103,7 @@ func (p *Plugin) MessageHasBeenPosted(c *plugin.Context, post *model.Post) {
 		p.PostBotDM(post.UserId, "Question added!")
 		return
 	case AskForParticipants:
-		err := p.AddParticipants(post.UserId, quizzID, post.Message)
+		err := p.AddParticipants(post.UserId, quizID, post.Message)
 		if err != nil {
 			p.PostBotDM(post.UserId, "There has been an internal error while adding the participants. Please, write the participant list again.")
 		}
@@ -126,9 +126,9 @@ func (p *Plugin) botRoutine() {
 	}
 }
 
-func (p *Plugin) quizRoutine(quizz *Quiz, channelID string) {
-	p.PostBotToChannel(channelID, fmt.Sprintf("Welcome to Colleague Quiz. Today we have the quiz `%s`.", quizz.ID))
-	for _, v := range quizz.Questions {
+func (p *Plugin) quizRoutine(quiz *Quiz, channelID string) {
+	p.PostBotToChannel(channelID, fmt.Sprintf("Welcome to Colleague Quiz. Today we have the quiz `%s`.", quiz.ID))
+	for _, v := range quiz.Questions {
 		if finishBotRoutine() {
 			p.PostBotToChannel(channelID, "Quiz game has been cancelled.")
 			return

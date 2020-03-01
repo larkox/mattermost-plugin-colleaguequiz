@@ -35,7 +35,6 @@ type Plugin struct {
 
 // OnActivate handles all initialization
 func (p *Plugin) OnActivate() error {
-	p.API.KVDeleteAll()
 	bot := &model.Bot{
 		Username:    botUsername,
 		DisplayName: botDisplayName,
