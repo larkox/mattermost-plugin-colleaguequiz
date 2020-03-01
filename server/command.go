@@ -35,7 +35,7 @@ func getCommand() *model.Command {
 		DisplayName:      "Colleague Quiz",
 		Description:      "Create quiz games with your colleagues.",
 		AutoComplete:     true,
-		AutoCompleteDesc: "Available commands: ",
+		AutoCompleteDesc: "Available commands: add, list, start",
 		AutoCompleteHint: "[command]",
 	}
 }
